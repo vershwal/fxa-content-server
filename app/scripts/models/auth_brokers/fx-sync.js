@@ -18,6 +18,7 @@ define(function (require, exports, module) {
   const Cocktail = require('cocktail');
   const p = require('lib/promise');
   const Logger = require('lib/logger');
+  const { SESSION_TOKEN_USED_FOR_SYNC } = require('lib/constants');
 
   const proto = BaseAuthenticationBroker.prototype;
 
@@ -28,6 +29,7 @@ define(function (require, exports, module) {
      * Must be overridden with an object that contains:
      *
      * {
+     *   BROWSER_STATUS: <specify in subclass>,
      *   CAN_LINK_ACCOUNT: <specify in subclass>,
      *   CHANGE_PASSWORD: <specify in subclass>,
      *   DELETE_ACCOUNT: <specify in subclass>,
@@ -40,6 +42,7 @@ define(function (require, exports, module) {
     commands: null,
 
     defaultCapabilities: _.extend({}, proto.defaultCapabilities, {
+      browserStatus: false,
       sendChangePasswordNotice: true
     }),
 
@@ -75,6 +78,41 @@ define(function (require, exports, module) {
       }
 
       return proto.initialize.call(this, options);
+    },
+
+    fetch (user) {
+      return proto.fetch.call(this, user)
+        .then(() => {
+          if (! this.hasCapability('browserStatus')) {
+            return;
+          }
+
+          // the delay is to give functional tests a little bit of time to attach
+          // WebChannel listeners before continuing.
+          const delay = this.environment.isFunctionalTests() ? 50 : 0;
+
+          // Request the currently signed in user data from the browser.
+          // If the browser returns a `signedInUser`, set that as the
+          // signed in account. If no signed in account is returned,
+          // clear the signed in account.
+          return p().delay(delay)
+            .then(() => this.request(this.getCommand('BROWSER_STATUS')))
+            .then((response = {}) => {
+              const userData = response.signedInUser;
+              if (userData) {
+                // merge account data with any existing account data. A Default account
+                // will be returned if none exists.
+                const account = user.getAccountByUid(userData.uid);
+                account.set(_.pick(userData, 'email', 'sessionToken', 'uid', 'verified'));
+                account.set('sessionTokenContext', SESSION_TOKEN_USED_FOR_SYNC);
+
+                return user.setSignedInAccount(account);
+              } else {
+                const signedInAccount = user.getSignedInAccount();
+                user.removeAccount(signedInAccount);
+              }
+            });
+        });
     },
 
     afterLoaded () {
@@ -254,4 +292,3 @@ define(function (require, exports, module) {
 
   module.exports = FxSyncAuthenticationBroker;
 });
-

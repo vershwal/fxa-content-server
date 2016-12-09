@@ -325,7 +325,7 @@ define(function (require, exports, module) {
 
         this._metrics.setBrokerType(this._authenticationBroker.type);
 
-        return this._authenticationBroker.fetch();
+        return this._authenticationBroker.fetch(this._user);
       }
     },
 

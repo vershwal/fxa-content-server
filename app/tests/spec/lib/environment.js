@@ -5,49 +5,47 @@
 define(function (require, exports, module) {
   'use strict';
 
-  const chai = require('chai');
+  const { assert } = require('chai');
   const Environment = require('lib/environment');
   const sinon = require('sinon');
   const WindowMock = require('../../mocks/window');
 
-  var assert = chai.assert;
-
-  describe('lib/environment', function () {
+  describe('lib/environment', () => {
     var environment;
     var windowMock;
 
-    beforeEach(function () {
+    beforeEach(() => {
       windowMock = new WindowMock();
       environment = new Environment(windowMock);
     });
 
-    describe('hasTouchEvents', function () {
-      it('return `true` if the UA supports touch events', function () {
+    describe('hasTouchEvents', () => {
+      it('return `true` if the UA supports touch events', () => {
         windowMock.ontouchstart = true;
         windowMock.DocumentTouch = windowMock.document;
 
         assert.isTrue(environment.hasTouchEvents());
       });
 
-      it('returns `false` if the UA does not support touch events', function () {
+      it('returns `false` if the UA does not support touch events', () => {
         assert.isFalse(environment.hasTouchEvents());
       });
     });
 
-    describe('hasPasswordRevealer', function () {
-      it('returns `true` if the UA has its own password revealer (IE >= 10)', function () {
+    describe('hasPasswordRevealer', () => {
+      it('returns `true` if the UA has its own password revealer (IE >= 10)', () => {
         windowMock.document.documentMode = 10;
 
         assert.isTrue(environment.hasPasswordRevealer());
       });
 
-      it('returns `false` if UA has no password revealer', function () {
+      it('returns `false` if UA has no password revealer', () => {
         assert.isFalse(environment.hasPasswordRevealer());
       });
     });
 
-    describe('hasGetUserMedia', function () {
-      beforeEach(function () {
+    describe('hasGetUserMedia', () => {
+      beforeEach(() => {
         windowMock.navigator.mediaDevices = null;
         delete windowMock.navigator.mediaDevices;
 
@@ -56,7 +54,7 @@ define(function (require, exports, module) {
       });
 
 
-      it('returns `true` if UA supports mediaDevices', function () {
+      it('returns `true` if UA supports mediaDevices', () => {
         windowMock.navigator.mediaDevices = {
           getUserMedia: sinon.spy()
         };
@@ -64,47 +62,47 @@ define(function (require, exports, module) {
         assert.isTrue(environment.hasGetUserMedia());
       });
 
-      it('returns `true` if UA supports getUserMedia', function () {
+      it('returns `true` if UA supports getUserMedia', () => {
         windowMock.navigator.getUserMedia = sinon.spy();
 
         assert.isTrue(environment.hasGetUserMedia());
       });
 
-      it('returns `true` if UA supports webkitGetUserMedia', function () {
+      it('returns `true` if UA supports webkitGetUserMedia', () => {
         windowMock.navigator.webkitGetUserMedia = sinon.spy();
 
         assert.isTrue(environment.hasGetUserMedia());
       });
 
-      it('returns `true` if UA supports mozGetUserMedia', function () {
+      it('returns `true` if UA supports mozGetUserMedia', () => {
         windowMock.navigator.mozGetUserMedia = sinon.spy();
 
         assert.isTrue(environment.hasGetUserMedia());
       });
 
-      it('returns `true` if UA supports msGetUserMedia', function () {
+      it('returns `true` if UA supports msGetUserMedia', () => {
         windowMock.navigator.msGetUserMedia = sinon.spy();
 
         assert.isTrue(environment.hasGetUserMedia());
       });
 
-      it('returns false otw', function () {
+      it('returns false otw', () => {
         assert.isFalse(environment.hasGetUserMedia());
       });
     });
 
-    describe('isFramed', function () {
-      it('returns `true` if window is iframed', function () {
+    describe('isFramed', () => {
+      it('returns `true` if window is iframed', () => {
         windowMock.top = new WindowMock();
 
         assert.isTrue(environment.isFramed());
       });
 
-      it('returns `false` if window is not iframed', function () {
+      it('returns `false` if window is not iframed', () => {
         assert.isFalse(environment.isFramed());
       });
 
-      it('returns `false` if the window\'s name is `remote`', function () {
+      it('returns `false` if the window\'s name is `remote`', () => {
         // `name=remote` is used by `about:accounts` by Fx Desktop. Do not
         // consider this framed.
         windowMock.top = new WindowMock();
@@ -112,7 +110,7 @@ define(function (require, exports, module) {
         assert.isFalse(environment.isFramed());
       });
 
-      it('returns `false` if the window\'s name is `payflow`', function () {
+      it('returns `false` if the window\'s name is `payflow`', () => {
         // `name=payflow` is used by Marketplace on Fx for Android during
         // the Reset PIN flow. Do not consider this framed.
         windowMock.top = new WindowMock();
@@ -121,14 +119,14 @@ define(function (require, exports, module) {
       });
     });
 
-    describe('isAboutAccounts', function () {
-      it('returns `true` if `remote` framed', function () {
+    describe('isAboutAccounts', () => {
+      it('returns `true` if `remote` framed', () => {
         windowMock.top = new WindowMock();
         windowMock.name = 'remote';
         assert.isTrue(environment.isAboutAccounts());
       });
 
-      it('returns `false` if name is not remote', function () {
+      it('returns `false` if name is not remote', () => {
         windowMock.top = new WindowMock();
         windowMock.name = undefined;
         assert.isFalse(environment.isAboutAccounts());
@@ -137,7 +135,7 @@ define(function (require, exports, module) {
         assert.isFalse(environment.isAboutAccounts());
       });
 
-      it('returns `true` if query param used', function () {
+      it('returns `true` if query param used', () => {
         windowMock.top = new WindowMock();
         windowMock.name = undefined;
         windowMock.location.search = '?service=sync&forceAboutAccounts=true';
@@ -145,27 +143,37 @@ define(function (require, exports, module) {
       });
     });
 
-    describe('isFxiOS', function () {
-      it('returns `true` if on Fx for iOS', function () {
+    describe('isFunctionalTests', () => {
+      it('returns `true` if UA string contains `FxaTester`, `false` otw', () => {
+        windowMock.navigator.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:52.0) Gecko/20100101 Firefox/52.0';
+        assert.isFalse(environment.isFunctionalTests());
+
+        windowMock.navigator.userAgent = 'Mozilla / 5.0(Macintosh; Intel Mac OS X 10.10; rv: 40.0) Gecko/ 20100101 Firefox/ 40.0 FxATester/ 1.0';
+        assert.isTrue(environment.isFunctionalTests());
+      });
+    });
+
+    describe('isFxiOS', () => {
+      it('returns `true` if on Fx for iOS', () => {
         windowMock.navigator.userAgent = 'FxiOS/1.0';
 
         assert.isTrue(environment.isFxiOS());
       });
 
-      it('returns `false` if not on Fx for iOS', function () {
+      it('returns `false` if not on Fx for iOS', () => {
         windowMock.navigator.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:40.0) Gecko/20100101 Firefox/40.0';
 
         assert.isFalse(environment.isFxiOS());
       });
     });
 
-    describe('hasSendBeacon', function () {
-      it('returns `true` if sendBeacon function exists', function () {
-        windowMock.navigator.sendBeacon = function () {};
+    describe('hasSendBeacon', () => {
+      it('returns `true` if sendBeacon function exists', () => {
+        windowMock.navigator.sendBeacon = () => {};
         assert.isTrue(environment.hasSendBeacon());
       });
 
-      it('returns `false` if sendBeacon is undefined', function () {
+      it('returns `false` if sendBeacon is undefined', () => {
         windowMock.navigator.sendBeacon = undefined;
         assert.isFalse(environment.hasSendBeacon());
       });

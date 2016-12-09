@@ -765,6 +765,11 @@ define([
     return this.parent
       .get(require.toUrl(url))
       .setFindTimeout(config.pageLoadTimeout)
+      .then(() => {
+        if (options.afterOpen) {
+          return options.afterOpen.call(this);
+        }
+      })
 
       // Wait until the `readySelector` element is found to return.
       .then(testElementExists(readySelector))

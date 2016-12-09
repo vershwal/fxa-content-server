@@ -28,6 +28,10 @@ define(function (require, exports, module) {
       Constructor: require('models/auth_brokers/fx-desktop-v3')
     },
     {
+      context: Constants.FX_DESKTOP_V4_CONTEXT,
+      Constructor: require('models/auth_brokers/fx-desktop-v4')
+    },
+    {
       context: Constants.FX_FENNEC_V1_CONTEXT,
       Constructor: require('models/auth_brokers/fx-fennec-v1')
     },

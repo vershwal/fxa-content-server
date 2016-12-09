@@ -103,6 +103,15 @@
       return isValidNativeFrame || isForced;
     },
 
+    /**
+     * Check if the functional tests are being run.
+     * @returns {Boolean}
+     */
+    isFunctionalTests: function () {
+      return /FxATester/i.test(this.window.navigator.userAgent);
+    },
+
+
     isFxiOS: function () {
       // User agent sniffing. Gross.
       return /FxiOS/.test(this.window.navigator.userAgent);

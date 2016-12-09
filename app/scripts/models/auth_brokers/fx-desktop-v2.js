@@ -64,8 +64,8 @@ define(function (require, exports, module) {
         .then(() => proto.afterCompleteResetPassword.call(this, account));
     },
 
-    fetch () {
-      return proto.fetch.call(this).then(() => {
+    fetch (user) {
+      return proto.fetch.call(this, user).then(() => {
         if (! this.environment.isAboutAccounts()) {
           // The default behavior of FxDesktop brokers is to halt before
           // the signup confirmation poll because about:accounts takes care
@@ -83,4 +83,3 @@ define(function (require, exports, module) {
 
   module.exports = FxDesktopV2AuthenticationBroker;
 });
-

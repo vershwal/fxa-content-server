@@ -11,13 +11,13 @@ define(function (require, exports, module) {
   'use strict';
 
   const _ = require('underscore');
-  const Constants = require('lib/constants');
+  const { ACCOUNT_UPDATES_WEBCHANNEL_ID } = require('lib/constants');
   const FxSyncAuthenticationBroker = require('./fx-sync');
   const WebChannel = require('lib/channels/web');
 
   const proto = FxSyncAuthenticationBroker.prototype;
 
-  const FxSyncWebChannelAuthenticationBroker = FxSyncAuthenticationBroker.extend({
+  module.exports = FxSyncAuthenticationBroker.extend({
     type: 'fx-sync-web-channel',
 
     defaultCapabilities: _.extend({}, proto.defaultCapabilities, {
@@ -25,6 +25,7 @@ define(function (require, exports, module) {
     }),
 
     commands: {
+      BROWSER_STATUS: 'fxaccounts:fxa_status',
       CAN_LINK_ACCOUNT: 'fxaccounts:can_link_account',
       CHANGE_PASSWORD: null,
       DELETE_ACCOUNT: 'fxaccounts:delete_account',
@@ -36,7 +37,7 @@ define(function (require, exports, module) {
     },
 
     createChannel () {
-      var channel = new WebChannel(Constants.ACCOUNT_UPDATES_WEBCHANNEL_ID);
+      const channel = new WebChannel(ACCOUNT_UPDATES_WEBCHANNEL_ID);
       channel.initialize({
         window: this.window
       });
@@ -44,7 +45,4 @@ define(function (require, exports, module) {
       return channel;
     }
   });
-
-  module.exports = FxSyncWebChannelAuthenticationBroker;
 });
-
