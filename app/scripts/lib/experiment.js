@@ -6,7 +6,6 @@ define(function (require, exports, module) {
   'use strict';
 
   const _ = require('underscore');
-  const ConnectAnotherDeviceExperiment = require('lib/experiments/connect-another-device');
   const Url = require('lib/url');
 
   const FORCE_EXPERIMENT_PARAM = 'forceExperiment';
@@ -14,7 +13,7 @@ define(function (require, exports, module) {
   const UA_OVERRIDE = 'FxATester';
 
   const ALL_EXPERIMENTS = {
-    'connectAnotherDevice': ConnectAnotherDeviceExperiment
+
   };
 
   function ExperimentInterface (options) {
