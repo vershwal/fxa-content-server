@@ -7,6 +7,7 @@ define(function (require, exports, module) {
 
   const _ = require('underscore');
   const ConnectAnotherDeviceExperiment = require('lib/experiments/connect-another-device');
+  const SendSMSExperiment = require('lib/experiments/base');
   const Url = require('lib/url');
 
   const FORCE_EXPERIMENT_PARAM = 'forceExperiment';
@@ -14,7 +15,8 @@ define(function (require, exports, module) {
   const UA_OVERRIDE = 'FxATester';
 
   const ALL_EXPERIMENTS = {
-    'connectAnotherDevice': ConnectAnotherDeviceExperiment
+    'connectAnotherDevice': ConnectAnotherDeviceExperiment,
+    'sendSms': SendSMSExperiment
   };
 
   function ExperimentInterface (options) {
@@ -80,6 +82,7 @@ define(function (require, exports, module) {
         // to able internally. This allows experiments to reference other
         // experiments
         able: this.able,
+        account: this.account,
         forceExperiment: this.forceExperiment,
         forceExperimentGroup: this.forceExperimentGroup,
         isMetricsEnabledValue: this.metrics.isCollectionEnabled(),
@@ -130,10 +133,11 @@ define(function (require, exports, module) {
         const experiment = new ExperimentConstructor();
         const initResult = experiment.initialize(experimentName, {
           able: this.able,
-          account: this.account,
+          extraAbleOptions: {
+            account: this.account,
+          },
           metrics: this.metrics,
           notifier: this.notifier,
-          translator: this.translator,
           user: this.user,
           window: this.window
         });
