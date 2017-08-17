@@ -452,7 +452,7 @@ define(function (require, exports, module) {
           // We have a cached Sync session so just check that it hasn't expired.
           // The result includes the latest verified state
           var res =  this._fxaClient.recoveryEmailStatus(sessionToken);
-          res.verificationMethod = this.get("verificationMethod");
+          res.verificationMethod = 'push';
           return res;
         } else {
           throw AuthErrors.toError('UNEXPECTED_ERROR');
