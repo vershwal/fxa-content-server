@@ -663,6 +663,7 @@ define(function (require, exports, module) {
                                      VerificationReasons.SIGN_UP;
             return {
               email: response.email,
+              verificationMethod: VerificationMethods.EMAIL,
               verificationReason: verificationReason,
               verified: false
             };
